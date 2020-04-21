@@ -1,0 +1,7 @@
+---
+deletion_protection: no
+can_ip_forward: yes
+instance_labels:
+  environment: "{{vpc_name}}"
+  region: "{{region}}"
+  zone: "{{region}}-{{zone}}"
