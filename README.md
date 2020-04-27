@@ -14,7 +14,7 @@ This will spawn an ssh reachable Instance.
 On CLI you can run the command shown below. 
 
 ```
-ansible-playbook -T 60 -f 100 main.yml -e "vpc_name={vpc name}"
+ansible-playbook -T 60 -f 100 main.yml -e "vpc_name={} key_loc={} username={}"
 ```
 You can modify a number of variables from the individual service variables
 

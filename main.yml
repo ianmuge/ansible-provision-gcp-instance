@@ -7,9 +7,9 @@
     auth_kind: "{{lookup('env','GCP_AUTH_KIND')}}"
     credentials_file: "{{lookup('env','GCP_SERVICE_ACCOUNT_FILE')}}"
     project_id: "{{lookup('env','GCP_PROJECT')}}"
-    vpc_name:
-    cnt: 2 #TODO: how many similar instances to create
-    instance_name: "test-server"
+    vpc_name: "default"
+    instance_count: 2 #instances to create
+    instance_name: "test"
     instance_type: "n1-standard-1"
     region: "us-central1"
     zone: "a"
@@ -17,8 +17,8 @@
     storage_size: 100
     source_image: "projects/ubuntu-os-cloud/global/images/family/ubuntu-1604-lts"
     address_name: address-instance
-    ssh_key_loc: 
-    ssh_username: 
+    key_loc: "~/.ssh/id_rsa.pub" #key locations
+    username: "" #server username
   pre_tasks:
     - name: fetch VPC details
       gcp_compute_network_info:
@@ -28,10 +28,6 @@
         auth_kind: "{{auth_kind}}"
         service_account_file: "{{credentials_file}}"
       register: network    
-    # - debug: var=network
-    # - shell: 'echo "$(ssh-keygen -y -f {{ssh_key_loc}}) {{ssh_username}}";'
-    #   register: ssh_meta
-    # - debug: var=ssh_meta
   roles:
     - Instance
   post_tasks:

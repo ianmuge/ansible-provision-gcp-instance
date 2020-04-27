@@ -1,50 +1,53 @@
 ---
+# - name: create a disk
+#   gcp_compute_disk:
+#     name: "{{disk_name}}"
+#     size_gb: "{{storage_size}}"
+#     source_image: "{{source_image}}"
+#     zone: "{{region}}-{{zone}}"
+#     project: "{{project_id}}"
+#     auth_kind: "{{auth_kind}}"
+#     service_account_file: "{{credentials_file}}"
+#     state: present
+#   register: disk
 
-- name: create a disk
-  gcp_compute_disk:
-    name: "{{disk_name}}"
-    size_gb: "{{storage_size}}"
-    source_image: "{{source_image}}"
-    zone: "{{region}}-{{zone}}"
-    project: "{{project_id}}"
-    auth_kind: "{{auth_kind}}"
-    service_account_file: "{{credentials_file}}"
-    state: present
-  register: disk
-
-- name: create a address
-  gcp_compute_address:
-    name: "{{address_name}}"
-    region: "{{region}}"
-    project: "{{project_id}}"
-    auth_kind: "{{auth_kind}}"
-    service_account_file: "{{credentials_file}}"
-    state: present
-  register: address
+# - name: create a address
+#   gcp_compute_address:
+#     name: "{{address_name}}"
+#     region: "{{region}}"
+#     project: "{{project_id}}"
+#     auth_kind: "{{auth_kind}}"
+#     service_account_file: "{{credentials_file}}"
+#     state: present
+#   register: address
 
 - name: Provision Instance
   gcp_compute_instance:
-    name: "{{instance_name}}"
+    name: "{{instance_name}}-{{item}}"
     machine_type: "{{instance_type}}"
     can_ip_forward: "{{can_ip_forward}}"
     deletion_protection: "{{deletion_protection}}"
     network_interfaces:
       - network: "{{ network.resources[0] }}"
         access_configs:
-          - name: External NAT
-            nat_ip: "{{ address }}"
+          - name: "External-NAT-{{item}}"
             type: ONE_TO_ONE_NAT
     disks:
       - auto_delete: yes
         boot: yes
-        source: "{{ disk }}"
-    # metadata: 
-    #   sshKeys: "{{ssh_meta.stdout}}"
+        initialize_params:
+          source_image: "{{source_image}}"
+          disk_size_gb: "{{storage_size}}"
+          disk_name: "{{disk_name}}-{{item}}"
+        # source: "{{ disk }}"
+    metadata: 
+      ssh-keys: "{{username}}:{{lookup('file', key_loc)}}"
     labels: "{{instance_labels}}"  
     zone: "{{region}}-{{zone}}"
     project: "{{project_id}}"
     auth_kind: "{{auth_kind}}"
     service_account_file: "{{credentials_file}}"
     state: present
+  loop: "{{ range(0, instance_count)|list }}"
 
       
